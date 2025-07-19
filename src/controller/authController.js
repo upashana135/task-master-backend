@@ -17,7 +17,7 @@ const login = async(req, res) =>{
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-            domain: '.upashana.me',
+            domain: process.env.NODE_ENV === 'production' ? '.upashana.me' : undefined,
             maxAge: 24 * 60 * 60 * 1000,
         })
 
@@ -30,7 +30,13 @@ const login = async(req, res) =>{
 
 const logout = async(req, res) => {
     try{
-        res.clearCookie('token');
+        res.clearCookie('token', {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+            domain: process.env.NODE_ENV === 'production' ? '.upashana.me' : undefined,
+        });
+        
         return successResponse(res, null, "Logged out successfully!", 201);
     }catch(error){
         return errorResponse(res, "Something went wrong!", 501)
