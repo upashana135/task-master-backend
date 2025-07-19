@@ -2,12 +2,25 @@ const express = require("express");
 const cors = require('cors');
 
 const app = express();
+app.set('trust proxy', 1); 
 app.use(express.json())
 
+const allowedOrigins = [
+  'http://127.0.0.1:3001',
+  'https://tm.upashana.me'
+];
+
 const corsOptions = {
-  origin: ['http://127.0.0.1:3001', 'https://tm.upashana.me'], 
-  credentials: true, 
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true)
+    } else {
+      callback(new Error('Not allowed by CORS'))
+    }
+  },
+  credentials: true,
 };
+
 app.use(cors(corsOptions));
 
 const PORT = 3000;
