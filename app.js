@@ -16,6 +16,10 @@ const routes = require("./src/route")
 
 app.use('/api', routes);
 
-app.listen(PORT, () => {
-    console.log(`Server is running at: ${PORT}`)
+// app.listen(PORT, () => {
+//     console.log(`Server is running at: ${PORT}`)
+// });
+
+app.listen(3001, '0.0.0.0', () => {
+  console.log('Server running on port 3001');
 });
