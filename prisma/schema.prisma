@@ -1,0 +1,119 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        BigInt  @default(autoincrement())
+  name      String  @db.VarChar(100)
+  password  String  @db.VarChar
+  email     String  @id @db.VarChar(100)
+  address   String? @db.VarChar
+  role      String? @db.VarChar
+  mobile_no String? @db.VarChar
+  bio       String? @db.VarChar
+
+  @@map("users")
+}
+
+model TaskAssignment {
+  id                  BigInt   @id @default(autoincrement())
+  name                String   @db.VarChar
+  created_by_user_id  BigInt
+  task_id             BigInt
+  start_date          DateTime @db.Date
+  end_date            DateTime @db.Date
+  status              String   @db.VarChar
+  assigned_to_user_id BigInt
+
+  @@map("task_assignments")
+}
+
+model TaskCommentAttachment {
+  id         BigInt   @id @default(autoincrement())
+  comment_id BigInt
+  file_url   String   @db.VarChar
+  file_name  String   @db.VarChar
+  updated_at DateTime @db.Date
+
+  @@map("task_comment_attachments")
+}
+
+model TaskComment {
+  id              BigInt   @id @default(autoincrement())
+  task_id         BigInt
+  commenter_email String   @db.VarChar
+  comment_text    String   @db.VarChar
+  comment_date    DateTime @db.Date
+  task              Task      @relation(fields: [task_id], references: [id], onDelete: Cascade)
+
+  @@map("task_comments")
+}
+
+model Task {
+  id               BigInt    @id @default(autoincrement())
+  title            String    @db.VarChar
+  description      String    @db.VarChar
+  start_date       DateTime  @db.Date
+  due_date         DateTime  @db.Date
+  completed_date   DateTime? @db.Date
+  created_by_user  BigInt
+  project_id       BigInt?
+  assigned_to_user String    @db.VarChar
+  status           String    @default("open") @db.VarChar
+  team_id          BigInt
+  taskComments   TaskComment[]
+
+  @@map("tasks")
+}
+
+model Team {
+  id            BigInt        @id @default(autoincrement())
+  name          String        @db.VarChar(100)
+  created_by    BigInt
+  created_at    DateTime      @db.Date
+  description   String?       @db.VarChar
+  project_teams ProjectTeam[]
+  teamMembers   TeamMember[]
+
+  @@map("teams")
+}
+
+model TeamMember {
+  id                BigInt    @id @default(autoincrement())
+  team_id           BigInt
+  joined_date       DateTime? @db.Date
+  invitation_status String    @default("invited") @db.VarChar
+  member_email      String    @db.VarChar
+  team              Team      @relation(fields: [team_id], references: [id], onDelete: Cascade)
+
+  @@unique([team_id, member_email], map: "team_members_unique_key")
+  @@map("team_members")
+}
+
+model Project {
+  id            BigInt        @id @default(autoincrement())
+  name          String        @db.VarChar
+  description   String?       @db.VarChar
+  created_by    BigInt
+  created_at    DateTime      @db.Date
+  project_teams ProjectTeam[]
+
+  @@map("projects")
+}
+
+model ProjectTeam {
+  id         BigInt  @id @default(autoincrement())
+  project_id BigInt
+  team_id    BigInt
+  project    Project @relation(fields: [project_id], references: [id], onDelete: Cascade)
+  team       Team    @relation(fields: [team_id], references: [id], onDelete: Cascade)
+
+  @@unique([project_id, team_id], map: "project_teams_unique_key")
+  @@map("project_teams")
+}
