@@ -5,8 +5,8 @@ const app = express();
 app.use(express.json())
 
 const corsOptions = {
-  origin: 'http://127.0.0.1:3001', // Replace with your frontend URL
-  credentials: true, // Allow cookies/auth headers
+  origin: ['http://127.0.0.1:3001', 'https://tm.upashana.me'], 
+  credentials: true, 
 };
 app.use(cors(corsOptions));
 
