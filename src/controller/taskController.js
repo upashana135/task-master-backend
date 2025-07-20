@@ -5,16 +5,20 @@ const createTask = async(req, res) =>{
     try{
         const {title, description, due_date, projectId, teamId, assignedTo } = req.body
         const {userId, userEmail} = req.user
-        const start_date = new Date();
-        // const completed_date = ""
+        const now = new Date();
+        const start_date = now;
         const parsedDueDate = new Date(due_date);
         const created_by_user = userId
-        let assigned_to_user = ""
-        if(assignedTo !== ""){
-            assigned_to_user = assignedTo
-        }else{
-            assigned_to_user = userEmail
+        const assigned_to_user = assignedTo !== "" ? assignedTo : userEmail
+
+        if (!title || !due_date || !projectId || !teamId) {
+            return errorResponse(res, "Fields marked with * are required.", 400);
         }
+
+        if (parsedDueDate < now) {
+            return errorResponse(res, "Due date cannot be in the past.", 400);
+        }
+
         const task = {title, description, start_date : start_date, due_date : parsedDueDate, created_by_user, assigned_to_user, project_id: projectId, team_id:teamId }
         await prisma.Task.create({data: task})
         return successResponse(res, null, "Task created successfully", 201)
@@ -79,6 +83,16 @@ const getAllTask = async(req, res) =>{
                 }
             },
             include: {
+                project: {
+                    select: {
+                        name: true
+                    }
+                },
+                team: {
+                    select: {
+                        name: true
+                    }
+                },
                 taskComments : {
                     select:{
                         id: true,

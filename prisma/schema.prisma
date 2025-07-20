@@ -63,11 +63,13 @@ model Task {
   due_date         DateTime  @db.Date
   completed_date   DateTime? @db.Date
   created_by_user  BigInt
-  project_id       BigInt?
+  project_id       BigInt
   assigned_to_user String    @db.VarChar
   status           String    @default("open") @db.VarChar
   team_id          BigInt
   taskComments   TaskComment[]
+  project   Project @relation(fields: [project_id], references: [id])
+  team      Team    @relation(fields: [team_id], references: [id])
 
   @@map("tasks")
 }
@@ -80,6 +82,7 @@ model Team {
   description   String?       @db.VarChar
   project_teams ProjectTeam[]
   teamMembers   TeamMember[]
+  tasks     Task[]
 
   @@map("teams")
 }
@@ -103,6 +106,7 @@ model Project {
   created_by    BigInt
   created_at    DateTime      @db.Date
   project_teams ProjectTeam[]
+  tasks     Task[]
 
   @@map("projects")
 }

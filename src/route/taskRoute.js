@@ -6,6 +6,6 @@ router.post("/", createTask)
 router.get("/", getAllTask)
 router.delete("/:id", deleteATask)
 router.patch("/:id", markTaskCompleted)
-router.post("/comments/:taskId", addTaskComment)
+router.post("/:taskId/comments", addTaskComment)
 
 module.exports = router
